@@ -90,7 +90,7 @@ public class controller : MonoBehaviour
             for (int i = 0; i < 5; i++)
             {
                 gun.transform.Translate(-0.03f, -0.1f, 0);
-                gun.transform.Rotate(-8f, 0, 0);
+                gun.transform.Rotate(-6f, 0, 0);
                 yield return new WaitForSeconds(0.015f);
             }
             yield return new WaitForSeconds(0.2f);
@@ -109,7 +109,7 @@ public class controller : MonoBehaviour
             for (int i = 0; i < 5; i++)
             {
                 gun.transform.Translate(0.03f, 0.1f, 0);
-                gun.transform.Rotate(8f, 0, 0);
+                gun.transform.Rotate(6f, 0, 0);
                 yield return new WaitForSeconds(0.015f);
             }
             for (int i = 0; i < 3; i++)
