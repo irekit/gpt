@@ -26,8 +26,11 @@ public class controller : MonoBehaviour
     [SerializeField] private GameObject cam;
     [SerializeField] private GameObject gun;
     [SerializeField] private GameObject gunhead;
+    [SerializeField] private int max_bul;
+    int bullets = 10;
     float veloc = 0;
     float xrot = 0;
+    float coold = 0;
     // Update is called once per frame
     void Update()
     {
@@ -44,9 +47,99 @@ public class controller : MonoBehaviour
         }
         if (Mouse.current.rightButton.wasPressedThisFrame)
         {
-            StartCoroutine(Twirl());
+            if(coold <= 0)
+            {
+                StartCoroutine(Twirl());
+
+            }
+        }
+        if (Mouse.current.leftButton.wasPressedThisFrame && coold < 10)
+        {
+            StartCoroutine(Shoot());
+            coold = 0.2f;
+        }
+        if (Mouse.current.leftButton.isPressed)
+        {
+            if (coold <= 0)
+            {
+                coold = 0.1f;
+                StartCoroutine(Shoot());
+            }
+        }
+        if(coold > 0)
+        {
+            coold -= Time.deltaTime;
         }
         trol.Move((wasd.x * transform.right + Vector3.up * veloc * Time.deltaTime + wasd.y * transform.forward) * Time.deltaTime * speed);
+    }
+    IEnumerator Shoot()
+    {
+        bullets -= 1;
+        if(bullets <= 0)
+        {
+            bullets = max_bul;
+            coold = 100000;
+            Quaternion lsr = gun.transform.localRotation;
+            Vector3 lsp = gun.transform.localPosition;
+            yield return new WaitForSeconds(0.2f);
+            for (int i = 0; i < 3; i++)
+            {
+                yield return new WaitForSeconds(0.01f);
+                gunhead.transform.Translate(-0.1f, 0, 0);
+            }
+            for (int i = 0; i < 5; i++)
+            {
+                gun.transform.Translate(-0.03f, -0.1f, 0);
+                gun.transform.Rotate(-8f, 0, 0);
+                yield return new WaitForSeconds(0.015f);
+            }
+            yield return new WaitForSeconds(0.2f);
+            for (int i = 0; i < 3; i++)
+            {
+                yield return new WaitForSeconds(0.01f);
+                gun.transform.Translate(0, 0.01f, 0);
+            }
+            yield return new WaitForSeconds(0.05f);
+            for (int i = 0; i < 3; i++)
+            {
+                yield return new WaitForSeconds(0.01f);
+                gun.transform.Translate(0, -0.01f, 0);
+            }
+            yield return new WaitForSeconds(0.05f);
+            for (int i = 0; i < 5; i++)
+            {
+                gun.transform.Translate(0.03f, 0.1f, 0);
+                gun.transform.Rotate(8f, 0, 0);
+                yield return new WaitForSeconds(0.015f);
+            }
+            for (int i = 0; i < 3; i++)
+            {
+                yield return new WaitForSeconds(0.01f);
+                gunhead.transform.Translate(0.1f, 0, 0);
+            }
+            gun.transform.localRotation = lsr;
+            gun.transform.localPosition = lsp;
+
+            yield return new WaitForSeconds(0.2f);
+            coold = 0.1f;
+        }
+        RaycastHit hit;
+        if(Physics.Raycast(cam.transform.position, cam.transform.forward, out hit))
+        {
+
+        }
+        for(int i = 0; i < 3; i++)
+        {
+            yield return new WaitForSeconds(0.015f);
+            gunhead.transform.Translate(-0.1f, 0, 0);
+            gun.transform.Translate(-0.02f, 0, 0);
+        }
+        for (int i = 0; i < 3; i++)
+        {
+            yield return new WaitForSeconds(0.015f);
+            gunhead.transform.Translate(0.1f, 0, 0);
+            gun.transform.Translate(0.02f, 0, 0);
+        }
     }
     IEnumerator Twirl()
     {
