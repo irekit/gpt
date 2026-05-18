@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class slowlyrotate : MonoBehaviour
 {
+    [SerializeField] private Vector3 speed;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -11,6 +12,6 @@ public class slowlyrotate : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.Rotate(0, Time.deltaTime * 35, 0);
+        transform.Rotate(Time.deltaTime * speed.x, Time.deltaTime * speed.y, Time.deltaTime * speed.z);
     }
 }

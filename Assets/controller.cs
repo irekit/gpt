@@ -55,8 +55,8 @@ public class controller : MonoBehaviour
         }
         if (Mouse.current.leftButton.wasPressedThisFrame && coold < 10)
         {
-            StartCoroutine(Shoot());
             coold = 0.2f;
+            StartCoroutine(Shoot());
         }
         if (Mouse.current.leftButton.isPressed)
         {
