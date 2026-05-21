@@ -17,7 +17,17 @@ public class controller : MonoBehaviour
         move = inp.FindAction("Player/Move");
         look.Enable();
         move.Enable();
+        v = new Vector4[8];
+        for (int i = 0; i < 8; i++)
+        {
+            v[i] = Vector4.zero;
+        }
+        gunref.SetActive(false);
+        gun.SetActive(true);
+        marker.SetActive(false);
+        og_markp = marker.transform.localPosition;
     }
+    public int weapon = 0;
     private CharacterController trol;
     [SerializeField] private float speed;
     [SerializeField] private float sens;
@@ -27,10 +37,53 @@ public class controller : MonoBehaviour
     [SerializeField] private GameObject gun;
     [SerializeField] private GameObject gunhead;
     [SerializeField] private int max_bul;
+    [SerializeField] private Material wallmat;
+    [SerializeField] private float fadespeed;
+    [SerializeField] private GameObject gunref;
+    [SerializeField] private GameObject heistm;
+    [SerializeField] private GameObject marker;
+    [SerializeField] private GameObject markd;
+    [SerializeField] private GameObject cap;
+    [SerializeField] private Color empc;
+    Vector3 og_markp;
     int bullets = 10;
+    private bool markeron = false;
     float veloc = 0;
     float xrot = 0;
     float coold = 0;
+    Vector4[] v;
+    [SerializeField]Texture2D whiteboard;
+    Vector2 last_penpos;
+    bool lastposreal = false;
+    void Draw(Vector2 coords)
+    {
+        int uvx = (int)(coords.x * whiteboard.width);
+        int uvy = (int)(coords.y * whiteboard.height);
+        uvx = Mathf.Clamp(uvx, 0, whiteboard.width - 1);
+        uvy = Mathf.Clamp(uvy, 0, whiteboard.height - 1);
+        int siz = Keyboard.current.shiftKey.isPressed ? 4 : 1;
+        for (int i = -siz; i <= siz; i++)
+        {
+            for (int j = -siz; j <= siz; j++)
+            {
+                int uvxn = uvx + i;
+                int uvyn = uvy + j;
+                if (uvxn >= 0 && uvxn < whiteboard.width && uvyn >= 0 && uvyn < whiteboard.height)
+                {
+                    if (Keyboard.current.shiftKey.isPressed)
+                    {
+                        whiteboard.SetPixel(uvxn, uvyn, empc);
+                    }
+                    else
+                    {
+                        whiteboard.SetPixel(uvxn, uvyn, Color.black);
+
+                    }
+
+                }
+            }
+        }
+    }
     // Update is called once per frame
     void Update()
     {
@@ -47,30 +100,166 @@ public class controller : MonoBehaviour
         }
         if (Mouse.current.rightButton.wasPressedThisFrame)
         {
-            if(coold <= 0)
+            if(coold <= 0 && weapon == 0)
             {
                 StartCoroutine(Twirl());
 
             }
-        }
-        if (Mouse.current.leftButton.wasPressedThisFrame && coold < 10)
-        {
-            coold = 0.2f;
-            StartCoroutine(Shoot());
-        }
-        if (Mouse.current.leftButton.isPressed)
-        {
-            if (coold <= 0)
+            if(weapon == 1)
             {
-                coold = 0.1f;
+                if (markeron)
+                {
+                    StartCoroutine(MarkerOff());
+                }
+                else
+                {
+                    StartCoroutine(MarkerOn());
+                }
+                markeron = !markeron;
+            }
+        }
+        if (Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            if (coold < 10 && weapon == 0)
+            {
+                coold = 0.2f;
                 StartCoroutine(Shoot());
             }
         }
-        if(coold > 0)
+        if (Mouse.current.leftButton.isPressed)
+        {
+            if (coold <= 0 && weapon == 0)
+            {
+                coold = 0.15f;
+                StartCoroutine(Shoot());
+            }
+            else if(weapon == 1)
+            {
+                RaycastHit hit;
+                if (markeron && Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, 3) && hit.collider.CompareTag("whiteboard"))
+                {
+                    if (lastposreal)
+                    {
+                        for(float i = 0;  i <= 3; i++)
+                        {
+                            Vector2 newppos = Vector2.Lerp(hit.textureCoord, last_penpos, i / 3);
+                            Draw(newppos);
+                        }
+                    }
+                    else
+                    {
+                        Draw(hit.textureCoord);
+                    }
+                        last_penpos = hit.textureCoord;
+                    lastposreal = true;
+                    marker.transform.position = hit.point;
+
+                    whiteboard.Apply();
+                }
+                else
+                {
+                    marker.transform.localPosition = og_markp;
+                    lastposreal = false;
+                }
+            }
+        }
+        else
+        {
+            marker.transform.localPosition = og_markp;
+            lastposreal = false;
+        }
+        if (coold > 0)
         {
             coold -= Time.deltaTime;
         }
-        trol.Move((wasd.x * transform.right + Vector3.up * veloc * Time.deltaTime + wasd.y * transform.forward) * Time.deltaTime * speed);
+        for (int i = 0; i < 8; i++)
+        {
+            if (v[i].w > 0)
+            {
+                v[i].w -= Time.deltaTime * fadespeed;
+            }
+            wallmat.SetVector("_v" + (i + 1), v[i]);
+        }
+        //shift for eraser
+        if (Keyboard.current.shiftKey.wasPressedThisFrame || Keyboard.current.shiftKey.wasReleasedThisFrame)
+        {
+            StartCoroutine(MarkerTurn());
+        }
+            trol.Move((wasd.x * transform.right + Vector3.up * veloc * Time.deltaTime + wasd.y * transform.forward) * Time.deltaTime * speed);
+        if (Keyboard.current.eKey.wasPressedThisFrame)
+        {
+            int lsd = weapon;
+            DropWeapon(weapon);
+            RaycastHit hit;
+            if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, 3))
+            {
+                if(hit.collider.gameObject == gunref)
+                {
+                    gunref.SetActive(false);
+                    gun.SetActive(true);
+                    weapon = 0;
+                }
+                else if(hit.collider.gameObject == heistm && lsd != 1)
+                {
+                    heistm.SetActive(false);
+                    marker.SetActive(true);
+                    weapon = 1;
+                }
+            }
+        }
+    }
+    IEnumerator MarkerOn()
+    {
+        float ysp = 0;
+        for(int i = 0; i < 25; i++)
+        {
+            ysp -= 0.04f;
+            cap.transform.Translate(0, ysp, 0.5f);
+            cap.transform.Rotate(0, -5, 0);
+            yield return new WaitForSeconds(0.015f);
+        }
+    }
+    IEnumerator MarkerTurn()
+    {
+        for(int i = 0; i < 18; i++)
+        {
+            yield return null;
+            markd.transform.Rotate(0, 10, 0);
+        }
+    }
+    IEnumerator MarkerOff()
+    {
+        float ysp = -1f;
+        for(int i = 0; i < 25; i++)
+        {
+            cap.transform.Rotate(0, 5, 0);
+            cap.transform.Translate(0, -ysp, -0.5f);
+            ysp += 0.04f;
+            yield return new WaitForSeconds(0.015f);
+        }
+    }
+    void DropWeapon(int weaponnum)
+    {
+        if(weaponnum == 0)
+        {
+            gunref.SetActive(true);
+            gunref.transform.position = gun.transform.position;
+            gunref.GetComponent<Rigidbody>().AddForce(cam.transform.forward * 200);
+            gunref.GetComponent<Rigidbody>().AddTorque(Vector3.forward * 40);
+            gun.SetActive(false);
+            weapon = -1;
+        }
+        else if(weaponnum == 1)
+        {
+            heistm.SetActive(true);
+            marker.SetActive(false);
+            weapon = -1;
+            if (markeron)
+            {
+                markeron = false;
+                StartCoroutine(MarkerOff());
+            }
+        }
     }
     IEnumerator Shoot()
     {
@@ -122,23 +311,47 @@ public class controller : MonoBehaviour
 
             yield return new WaitForSeconds(0.2f);
             coold = 0.1f;
+            yield break;
         }
         RaycastHit hit;
         if(Physics.Raycast(cam.transform.position, cam.transform.forward, out hit))
         {
-
+            if (hit.collider.CompareTag("wall"))
+            {
+                int ind = -1;
+                int maxind = 0;
+                float minim = 10;
+                for(int i = 0; i < 8; i++)
+                {
+                    if (v[i].w < minim)
+                    {
+                        maxind = i;
+                        minim = v[i].w;
+                    }
+                    if(v[i].w <= 0)
+                    {
+                        ind = i;
+                        break;
+                    }
+                }
+                if(ind == -1)
+                {
+                    ind = maxind;
+                }
+                v[ind] = new Vector4(hit.point.x, hit.point.y, hit.point.z, 1);
+            }
         }
         for(int i = 0; i < 3; i++)
         {
             yield return new WaitForSeconds(0.015f);
             gunhead.transform.Translate(-0.1f, 0, 0);
-            gun.transform.Translate(-0.02f, 0, 0);
+            gun.transform.Rotate(0, 0, 4.5f);
         }
         for (int i = 0; i < 3; i++)
         {
             yield return new WaitForSeconds(0.015f);
             gunhead.transform.Translate(0.1f, 0, 0);
-            gun.transform.Translate(0.02f, 0, 0);
+            gun.transform.Rotate(0, 0, -4.5f);
         }
     }
     IEnumerator Twirl()
