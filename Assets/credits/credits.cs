@@ -6,6 +6,8 @@ using UnityEngine;
 //globe by fyrn.art
 //clock by felipeMSX
 //marker by tankop1
+//chair by jamie mcfarlane
+//data centre by ryoce
 public class credits
 {
     

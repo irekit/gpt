@@ -53,6 +53,7 @@ public class controller : MonoBehaviour
     float coold = 0;
     Vector4[] v;
     [SerializeField]Texture2D whiteboard;
+    [SerializeField] ParticleSystem bulletcase;
     Vector2 last_penpos;
     bool lastposreal = false;
     void Draw(Vector2 coords)
@@ -341,6 +342,7 @@ public class controller : MonoBehaviour
                 v[ind] = new Vector4(hit.point.x, hit.point.y, hit.point.z, 1);
             }
         }
+        bulletcase.Emit(1);
         for(int i = 0; i < 3; i++)
         {
             yield return new WaitForSeconds(0.015f);
