@@ -6,6 +6,10 @@ TagManager:
   tags:
   - wall
   - whiteboard
+  - ignore
+  - waterglass
+  - squid
+  - lenstable
   layers:
   - Default
   - TransparentFX
@@ -13,7 +17,7 @@ TagManager:
   - gun
   - Water
   - UI
-  - 
+  - ignored
   - 
   - 
   - 
@@ -48,6 +52,24 @@ TagManager:
     locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: to
+    uniqueID: 3096425363
+    locked: 0
+  - name: topa
+    uniqueID: 3845552503
+    locked: 0
+  - name: topp
+    uniqueID: 2116112809
+    locked: 0
+  - name: ui
+    uniqueID: 2867412011
+    locked: 0
+  - name: ui2
+    uniqueID: 3539039369
+    locked: 0
+  - name: gr
+    uniqueID: 4243215497
     locked: 0
   m_RenderingLayers:
   - Default

@@ -8,6 +8,10 @@ public class controller : MonoBehaviour
     [SerializeField] private InputActionAsset inp;
     private InputAction look;
     private InputAction move;
+    [SerializeField] private GameObject squid;
+    [SerializeField] private GameObject[] deactglass;
+    Vector3 original_my_squid;
+    [SerializeField] private Material white_squid;
     void Start()
     {
         trol = GetComponent<CharacterController>();
@@ -26,9 +30,12 @@ public class controller : MonoBehaviour
         gun.SetActive(true);
         marker.SetActive(false);
         og_markp = marker.transform.localPosition;
+        my_squid.SetActive(false);
+        original_my_squid = my_squid.transform.localPosition;
     }
     public int weapon = 0;
     private CharacterController trol;
+    [SerializeField] private GameObject squidw;
     [SerializeField] private float speed;
     [SerializeField] private float sens;
     [SerializeField] private float gravity;
@@ -45,6 +52,7 @@ public class controller : MonoBehaviour
     [SerializeField] private GameObject markd;
     [SerializeField] private GameObject cap;
     [SerializeField] private Color empc;
+    [SerializeField] private GameObject my_squid;
     Vector3 og_markp;
     int bullets = 10;
     private bool markeron = false;
@@ -192,7 +200,7 @@ public class controller : MonoBehaviour
             int lsd = weapon;
             DropWeapon(weapon);
             RaycastHit hit;
-            if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, 3))
+            if (lsd == -1 && Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, 3))
             {
                 if(hit.collider.gameObject == gunref)
                 {
@@ -205,6 +213,13 @@ public class controller : MonoBehaviour
                     heistm.SetActive(false);
                     marker.SetActive(true);
                     weapon = 1;
+                }
+                else if (hit.collider.CompareTag("squid"))
+                {
+                    squid.SetActive(false);
+                    my_squid.SetActive(true);
+                    my_squid.transform.localPosition = original_my_squid;
+                    weapon = 2;
                 }
             }
         }
@@ -261,6 +276,25 @@ public class controller : MonoBehaviour
                 StartCoroutine(MarkerOff());
             }
         }
+        else if(weaponnum == 2)
+        {
+            StartCoroutine(SquidDrop());
+        }
+    }
+    IEnumerator SquidDrop()
+    {
+        for(int i = 0; i < 10; i++)
+        {
+            my_squid.transform.Translate(0, -Time.deltaTime * 10, 0);
+            yield return null;
+        }
+        my_squid.transform.localPosition = original_my_squid;
+        my_squid.SetActive(false);
+        weapon = -1;
+        squid.SetActive(true);
+        Vector3 squid_p = transform.position;
+        squid_p.y = -1.75f;
+        squid.transform.position = squid_p;
     }
     IEnumerator Shoot()
     {
@@ -317,6 +351,17 @@ public class controller : MonoBehaviour
         RaycastHit hit;
         if(Physics.Raycast(cam.transform.position, cam.transform.forward, out hit))
         {
+            if (hit.collider.CompareTag("waterglass"))
+            {
+                squid.GetComponent<Animator>().enabled = false;
+                squid.GetComponent<BoxCollider>().enabled = true;
+                squidw.GetComponent<SkinnedMeshRenderer>().material = white_squid;
+                squid.transform.position = new Vector3(squid.transform.position.x, -1.75f, squid.transform.position.z);
+                for(int i =0; i < deactglass.Length;i++)
+                {
+                    deactglass[i].SetActive(false);
+                }
+            }
             if (hit.collider.CompareTag("wall"))
             {
                 int ind = -1;
@@ -341,6 +386,10 @@ public class controller : MonoBehaviour
                 }
                 v[ind] = new Vector4(hit.point.x, hit.point.y, hit.point.z, 1);
             }
+            if (hit.collider.CompareTag("squid"))
+            {
+                squid.transform.Rotate(0, UnityEngine.Random.Range(-20f, 20f), 0);
+            }
         }
         bulletcase.Emit(1);
         for(int i = 0; i < 3; i++)
@@ -354,6 +403,16 @@ public class controller : MonoBehaviour
             yield return new WaitForSeconds(0.015f);
             gunhead.transform.Translate(0.1f, 0, 0);
             gun.transform.Rotate(0, 0, -4.5f);
+        }
+    }
+    void OnCollisionStay(Collision other)
+    {
+        if (other.collider.CompareTag("lenstable"))
+        {
+            if (Keyboard.current.qKey.isPressed)
+            {
+
+            }
         }
     }
     IEnumerator Twirl()
