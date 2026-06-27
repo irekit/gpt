@@ -5740,7 +5740,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3959890157224637356, guid: 215c93427130c1449885b2cdc11fea1b, type: 3}
       propertyPath: first_neuron
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3959890157224637356, guid: 215c93427130c1449885b2cdc11fea1b, type: 3}
       propertyPath: axons.Array.size
@@ -7552,7 +7552,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3959890157224637356, guid: 215c93427130c1449885b2cdc11fea1b, type: 3}
       propertyPath: ininc
-      value: 4.5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3959890157224637356, guid: 215c93427130c1449885b2cdc11fea1b, type: 3}
       propertyPath: electric
@@ -7568,7 +7568,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3959890157224637356, guid: 215c93427130c1449885b2cdc11fea1b, type: 3}
       propertyPath: scalmult
-      value: 0.02
+      value: 0.01
       objectReference: {fileID: 0}
     - target: {fileID: 3959890157224637356, guid: 215c93427130c1449885b2cdc11fea1b, type: 3}
       propertyPath: threshold
@@ -7584,7 +7584,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3959890157224637356, guid: 215c93427130c1449885b2cdc11fea1b, type: 3}
       propertyPath: sensitivity
-      value: 0.3
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 3959890157224637356, guid: 215c93427130c1449885b2cdc11fea1b, type: 3}
       propertyPath: first_neuron
@@ -7616,7 +7616,7 @@ PrefabInstance:
       objectReference: {fileID: 1089599376}
     - target: {fileID: 3959890157224637356, guid: 215c93427130c1449885b2cdc11fea1b, type: 3}
       propertyPath: 'weights.Array.data[0]'
-      value: 0.5
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6017245536889439802, guid: 215c93427130c1449885b2cdc11fea1b, type: 3}
       propertyPath: m_Name

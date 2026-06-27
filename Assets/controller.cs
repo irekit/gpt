@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 public class controller : MonoBehaviour
 {
     [SerializeField] private InputActionAsset inp;
@@ -405,13 +406,13 @@ public class controller : MonoBehaviour
             gun.transform.Rotate(0, 0, -4.5f);
         }
     }
-    void OnCollisionStay(Collision other)
+    void OnTriggerStay(Collider other)
     {
-        if (other.collider.CompareTag("lenstable"))
+        if (other.CompareTag("lenstable"))
         {
-            if (Keyboard.current.qKey.isPressed)
+            if (Keyboard.current.qKey.isPressed && weapon == 2)
             {
-
+                SceneManager.LoadScene(1);
             }
         }
     }
