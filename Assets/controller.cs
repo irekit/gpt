@@ -27,12 +27,53 @@ public class controller : MonoBehaviour
         {
             v[i] = Vector4.zero;
         }
-        gunref.SetActive(false);
-        gun.SetActive(true);
-        marker.SetActive(false);
         og_markp = marker.transform.localPosition;
-        my_squid.SetActive(false);
         original_my_squid = my_squid.transform.localPosition;
+
+        transform.position = maingame.data.player_position;
+        weapon = maingame.data.weapon;
+        if(weapon != 0)
+        {
+            gun.SetActive(false);
+            gunref.SetActive(true);
+            gunref.transform.position = maingame.data.gun_position;
+        }
+        if(weapon != 2)
+        {
+            my_squid.SetActive(false);
+            squid.SetActive(true);
+            squid.transform.position = maingame.data.squid_position;
+        }
+        if(weapon != 1)
+        {
+            marker.SetActive(false);
+            heistm.SetActive(true);
+        }
+        if(weapon == 0)
+        {
+            gunref.SetActive(false);
+            gun.SetActive(true);
+        }
+        else if(weapon == 1)
+        {
+            marker.SetActive(true);
+            heistm.SetActive(false);
+        }
+        else if(weapon == 2)
+        {
+            squid.SetActive(false);
+            my_squid.SetActive(true);
+        }
+        if (maingame.data.squid_active)
+        {
+            squid.GetComponent<Animator>().enabled = false;
+            squid.GetComponent<BoxCollider>().enabled = true;
+            squidw.GetComponent<SkinnedMeshRenderer>().material = white_squid;
+            for (int i = 0; i < deactglass.Length; i++)
+            {
+                deactglass[i].SetActive(false);
+            }
+        }
     }
     public int weapon = 0;
     private CharacterController trol;
@@ -127,6 +168,10 @@ public class controller : MonoBehaviour
                 }
                 markeron = !markeron;
             }
+        }
+        if (Keyboard.current.cKey.wasPressedThisFrame)
+        {
+            maingame.SaveGame();
         }
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
@@ -224,6 +269,10 @@ public class controller : MonoBehaviour
                 }
             }
         }
+        maingame.data.player_position = transform.position;
+        maingame.data.gun_position = gunref.transform.position;
+        maingame.data.squid_position = squid.transform.position;
+        maingame.data.weapon = weapon;
     }
     IEnumerator MarkerOn()
     {
@@ -354,6 +403,7 @@ public class controller : MonoBehaviour
         {
             if (hit.collider.CompareTag("waterglass"))
             {
+                maingame.data.squid_active = true;
                 squid.GetComponent<Animator>().enabled = false;
                 squid.GetComponent<BoxCollider>().enabled = true;
                 squidw.GetComponent<SkinnedMeshRenderer>().material = white_squid;
@@ -412,6 +462,7 @@ public class controller : MonoBehaviour
         {
             if (Keyboard.current.qKey.isPressed && weapon == 2)
             {
+                maingame.SaveGame();
                 SceneManager.LoadScene(1);
             }
         }
