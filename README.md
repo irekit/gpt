@@ -13,7 +13,7 @@ Note: The name GPT refers to the technology (generative pre-trained transformers
 
 Controls:
 
-c to save, wasd + mouse to move. In the cutscenes, press enter to continue.
+c to save, wasd + mouse to move. Shift to switch to eraser mode in whiteboard marker, the rest of items are used through right click and/or left click. In the cutscenes, press enter to continue.
 
 
 Credits
